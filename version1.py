@@ -83,7 +83,7 @@ def test_file(info, path):
 
         start = time.time()
         os.system(test_path)
-        elapse = time.time() - start
+        elapse = time.time() - start - 0.14   # Compensate for booting program (tested).
         elapse = str(int(100000*elapse)/100)
 
         if os.path.isfile(os.path.join(pardir, "file.out")):
