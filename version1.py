@@ -15,6 +15,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+import sys
 import os
 import time
 import multiprocessing
@@ -55,6 +56,13 @@ def test_file(info, path):
     if not os.path.isfile(path):
         print(f"Invalid path: {path}")
         return
+
+    pardir = os.path.realpath(os.path.dirname(__file__))
+
+    with open(path, "r") as file:
+        data = file.read()
+    with open(os.path.join(pardir, "test.py"), "w") as file:
+        file.write(data)
 
 
 def main():
