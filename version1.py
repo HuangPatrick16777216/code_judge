@@ -26,24 +26,35 @@ colorama.init()
 
 def check_test_info(path):
     if not os.path.isdir(path):
-        raise FileNotFoundError(f"Invalid path: {path}")
+        print(f"Invalid path: {path}")
+        return
     if not os.path.isfile(os.path.join(path, "info.json")):
-        raise FileNotFoundError("No info file (info.json).")
-
-    info = {}
+        print("No info file (info.json).")
+        return
 
     with open(os.path.join(path, "info.json"), "r") as file:
         json_info = json.load(file)
 
+    info = {}
+    info["path"] = path
     info["time_limit"] = json_info["time_limit"]
     info["cases"] = json_info["cases"]
+
     for case in info["cases"]:
         if not os.path.isfile(os.path.join(path, f"{case}.in")):
-            raise FileNotFoundError(f"Missing input file for case {case}")
+            print(f"Missing input file for case {case}")
+            return
         if not os.path.isfile(os.path.join(path, f"{case}.out")):
-                raise FileNotFoundError(f"Missing output file for case {case}")
+            print(f"Missing output file for case {case}")
+            return
 
     return info
+
+
+def test_file(info, path):
+    if not os.path.isfile(path):
+        print(f"Invalid path: {path}")
+        return
 
 
 def main():
@@ -60,6 +71,10 @@ def main():
             result = check_test_info(path)
             if isinstance(result, dict):
                 test_info = result
+
+        elif cmd.startswith("test"):
+            path = cmd.replace("test", "").strip()
+            test_file(test_info, path)
 
 
 main()
