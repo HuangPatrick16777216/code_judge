@@ -52,7 +52,10 @@ def main():
     while True:
         cmd = input(">>> ")
 
-        if cmd.startswith("set"):
+        if cmd in ("quit", "exit"):
+            return
+
+        elif cmd.startswith("set"):
             path = cmd.replace("set", "").strip()
             result = check_test_info(path)
             if isinstance(result, dict):
