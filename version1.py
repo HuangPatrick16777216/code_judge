@@ -18,11 +18,45 @@
 import os
 import time
 import multiprocessing
+import json
+import colorama
+from colorama import Fore
+colorama.init()
+
+
+def check_test_info(path):
+    if not os.path.isdir(path):
+        raise FileNotFoundError(f"Invalid path: {path}")
+    if not os.path.isfile(os.path.join(path, "info.json")):
+        raise FileNotFoundError("No info file (info.json).")
+
+    info = {}
+
+    with open(os.path.join(path, "info.json"), "r") as file:
+        json_info = json.load(file)
+
+    info["time_limit"] = json_info["time_limit"]
+    info["cases"] = json_info["cases"]
+    for case in info["cases"]:
+        if not os.path.isfile(os.path.join(path, f"{case}.in")):
+            raise FileNotFoundError(f"Missing input file for case {case}")
+        if not os.path.isfile(os.path.join(path, f"{case}.out")):
+                raise FileNotFoundError(f"Missing output file for case {case}")
+
+    return info
 
 
 def main():
+    test_info = None
+
     while True:
         cmd = input(">>> ")
+
+        if cmd.startswith("set"):
+            path = cmd.replace("set", "").strip()
+            result = check_test_info(path)
+            if isinstance(result, dict):
+                test_info = result
 
 
 main()
