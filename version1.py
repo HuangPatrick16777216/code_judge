@@ -53,16 +53,53 @@ def check_test_info(path):
 
 
 def test_file(info, path):
+    if info is None:
+        print(f"Invalid info.")
+        return
     if not os.path.isfile(path):
         print(f"Invalid path: {path}")
         return
 
     pardir = os.path.realpath(os.path.dirname(__file__))
+    test_path = os.path.join(pardir, "test.py")
+    data_path = info["path"]
 
     with open(path, "r") as file:
         data = file.read()
-    with open(os.path.join(pardir, "test.py"), "w") as file:
+    with open(test_path, "w") as file:
         file.write(data)
+
+    for case in info["cases"]:
+        with open(os.path.join(data_path, f"{case}.in"), "r") as file:
+            data = file.read()
+        with open(os.path.join(pardir, "file.in"), "w") as file:
+            file.write(data)
+        with open(os.path.join(data_path, f"{case}.out"), "r") as file:
+            correct_ans = file.read().strip()
+
+        msg = f"Testing case {case}"
+        sys.stdout.write(msg)
+        sys.stdout.flush()
+
+        start = time.time()
+        os.system(test_path)
+        elapse = time.time() - start
+        elapse = str(int(100000*elapse)/100)
+
+        if os.path.isfile(os.path.join(pardir, "file.out")):
+            with open(os.path.join(pardir, "file.out"), "r") as file:
+                ans = file.read()
+            if ans == correct_ans:
+                result = Fore.GREEN + f"Correct, {elapse}ms"
+            else:
+                result = Fore.RED + f"Wrong"
+        else:
+            result = Fore.RED + "No output file."
+
+        sys.stdout.write("\r" + " "*len(msg) + "\r")
+        sys.stdout.write(result)
+        sys.stdout.write(Fore.WHITE)
+        sys.stdout.flush()
 
 
 def main():
@@ -75,13 +112,13 @@ def main():
             return
 
         elif cmd.startswith("set"):
-            path = cmd.replace("set", "").strip()
+            path = cmd[3:].strip()
             result = check_test_info(path)
             if isinstance(result, dict):
                 test_info = result
 
         elif cmd.startswith("test"):
-            path = cmd.replace("test", "").strip()
+            path = cmd[4:].strip()
             test_file(test_info, path)
 
 
