@@ -61,10 +61,13 @@ def test_file(info, path):
         return
 
     pardir = os.path.realpath(os.path.dirname(__file__))
+    test_path = os.path.join(pardir, "test.py")
     data_path = info["path"]
 
     with open(path, "r") as file:
-        test_data = file.read()
+        data = file.read()
+    with open(test_path, "w") as file:
+        file.write(data)
 
     for case in info["cases"]:
         with open(os.path.join(data_path, f"{case}.in"), "r") as file:
@@ -79,7 +82,7 @@ def test_file(info, path):
         sys.stdout.flush()
 
         start = time.time()
-        exec(test_data)
+        os.system(test_path)
         elapse = time.time() - start
         elapse = str(int(100000*elapse)/100)
 
@@ -99,8 +102,12 @@ def test_file(info, path):
         sys.stdout.write("\n")
         sys.stdout.flush()
 
+    os.remove(test_path)
     os.remove(os.path.join(pardir, "file.in"))
-    os.remove(os.path.join(pardir, "file.out"))
+    try:
+        os.remove(os.path.join(pardir, "file.out"))
+    except FileNotFoundError:
+        pass
 
 
 def main():
