@@ -117,7 +117,7 @@ class Client:
         length = int(len_msg)
         data = b""
         while len(data) < length:
-            curr_len = min(self.packet_size, self.header-len(data))
+            curr_len = min(self.packet_size, length-len(data))
             data += self.conn.recv(curr_len)
 
         return pickle.loads(data)
