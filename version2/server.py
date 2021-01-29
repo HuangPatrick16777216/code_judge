@@ -156,6 +156,7 @@ class Grader:
         self.pids = []
 
         os.makedirs(os.path.join(self.parent, "grader"), exist_ok=True)
+        os.makedirs(os.path.join(self.parent, "submissions"), exist_ok=True)
         self.load_problems()
         threading.Thread(target=self.grader).start()
 
@@ -164,24 +165,53 @@ class Grader:
             while len(self.queue) == 0:
                 time.sleep(0.01)
 
-            client, pid, lang, code = self.queue.pop(0)
-            submit_path = os.path.join(self.parent, "grader", "submission")
-            with open(os.path.join(self.parent, "problems", self.pids[[x[1] for x in self.pids].index(pid)][0]), "rb") as file:
-                prob_data = pickle.load(file)
-            with open(submit_path, "w") as file:
-                file.write(code)
+            try:
+                client, pid, lang, code = self.queue.pop(0)
+                submit_path = os.path.join(self.parent, "grader", "submission")
+                in_path = os.path.join(self.parent, "grader", "in")
+                out_path = os.path.join(self.parent, "grader", "out")
+                data_path = os.path.join(self.parent, "problems", self.pids[[x[1] for x in self.pids].index(pid)][0])
 
-            inpath = os.path.join(self.parent, "grader", "in")
-            outpath = os.path.join(self.parent, "grader", "out")
-            for indata, outdata in prob_data["cases"]:
-                with open(inpath, "w") as file:
-                    file.write(indata)
-                with open(outpath, "w") as file:
-                    file.close()
+                with open(data_path, "rb") as file:
+                    prob_data = pickle.load(file)
+                with open(submit_path, "w") as file:
+                    file.write(code)
 
-                with open(inpath, "r") as infile, open(outpath, "w") as outfile:
-                    if lang == 1:
-                        subprocess.Popen(["python3", submit_path], stdin=infile, stdout=outfile)
+                # Compile files here
+
+                client.send({"type": "submit", "num_cases": len(prob_data["cases"])})
+
+                for in_data, out_data in prob_data["cases"]:
+                    with open(in_path, "w") as file:
+                        file.write(in_data)
+                    with open(out_path, "w") as file:
+                        file.close()
+
+                    with open(in_path, "r") as in_file, open(out_path, "w") as out_file:
+                        commands = None
+                        time_start = time.time()
+
+                        if lang == 1:
+                            commands = ["python3", submit_path]
+                        elif lang == 2:
+                            commands = ["python2", submit_path]
+
+                        if commands is not None:
+                            subprocess.Popen(commands, stdin=in_file, stdout=out_file)
+                            elapse = time.time() - time_start
+
+                    with open(out_path, "w") as file:
+                        ans = file.read()
+                    if ans == "":
+                        result = "e"
+                    elif ans.strip() == out_data.strip():
+                        result = "c"
+                    else:
+                        result = "x"
+                    client.send({"type": "submit", "result": result})
+
+            except Exception as e:
+                print(f"Error in grading: {e}")
 
     def load_problems(self):
         for filepath in os.listdir(os.path.join(self.parent, "problems")):
