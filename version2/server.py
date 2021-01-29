@@ -168,14 +168,23 @@ class Grader:
             try:
                 client, pid, lang, code = self.queue.pop(0)
                 submit_path = os.path.join(self.parent, "grader", "submission")
+                submissions_path = os.path.join(self.parent, "submissions")
+                compiled_path = os.path.join(self.parent, "grader", "compiled")
                 in_path = os.path.join(self.parent, "grader", "in")
                 out_path = os.path.join(self.parent, "grader", "out")
                 data_path = os.path.join(self.parent, "problems", self.pids[[x[1] for x in self.pids].index(pid)][0])
+                submit_save_path = "0"
+                if len(os.listdir(submissions_path)) > 0:
+                    submit_save_path = str(max(map(int, os.listdir(submissions_path)))+1)
+                submit_save_path = os.path.join(self.parent, "submissions", submit_save_path)
 
                 with open(data_path, "rb") as file:
                     prob_data = pickle.load(file)
                 with open(submit_path, "w") as file:
                     file.write(code)
+
+                with open(submit_save_path, "w") as file:
+                    json.dump({"from": client.addr, "code": code}, file, indent=4)
 
                 # Compile files here
 
