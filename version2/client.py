@@ -15,14 +15,18 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+import sys
 import os
 import socket
 import pickle
 import json
+import colorama
+from colorama import Fore
 from hashlib import sha256
 from tkinter import Tk
 from tkinter.filedialog import askopenfilename
 Tk().withdraw()
+colorama.init()
 
 
 class Client:
@@ -111,7 +115,20 @@ def main():
                 reply = conn.recv()
                 print()
                 if reply["status"]:
-                    print("The server is grading your submission.")
+                    print("Your submission is in the server queue and will be graded shortly.")
+                    num_cases = conn.recv()["num_cases"]
+                    print(f"Total {num_cases} cases")
+                    print(f"c = correct, e = empty output, x = wrong")
+                    for case in range(num_cases):
+                        msg = str(case)
+                        msg += " " * (6-len(msg))
+                        sys.stdout.write(msg)
+                    for case in range(num_cases):
+                        result = conn.recv()["result"]
+                        color = Fore.GREEN if result == "c" else Fore.RED
+                        msg = result + " "*5
+                        print(f"{color}{msg}{Fore.RESET}")
+
                 else:
                     print("The server sent an error: "+reply["error"])
 
