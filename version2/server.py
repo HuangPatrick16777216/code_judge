@@ -69,9 +69,10 @@ class Client:
         threading.Thread(target=self.start).start()
 
     def auth(self):
-        task = "".join(random.choices(bytes(range(256)), k=64)).encode()
+        chars = bytes(range(256))
+        task = b"".join(random.choices([chars[i:i+1] for i in range(len(chars))], k=64))
         answer = sha256(task).hexdigest()
-        self.send({"type": "auth"})
+        self.send({"type": "auth", "task": task})
         reply = self.recv()["answer"]
         if answer == reply:
             self.alert("INFO", "Authenticated")
