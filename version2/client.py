@@ -22,6 +22,7 @@ import json
 from hashlib import sha256
 from tkinter import Tk
 from tkinter.filedialog import askopenfilename
+Tk().withdraw()
 
 
 class Client:
@@ -106,7 +107,13 @@ def main():
                     "code": code,
                 }
                 conn.send(data)
+
                 reply = conn.recv()
+                print()
+                if reply["status"]:
+                    print("The server is grading your submission.")
+                else:
+                    print("The server sent an error: "+reply["error"])
 
 
 main()
