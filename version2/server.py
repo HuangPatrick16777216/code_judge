@@ -165,20 +165,35 @@ class Grader:
                 time.sleep(0.01)
 
             client, pid, lang, code = self.queue.pop(0)
-            with open(os.path.join(self.parent, "grader", "submission"), "w") as file:
+            submit_path = os.path.join(self.parent, "grader", "submission")
+            with open(os.path.join(self.parent, "problems", self.pids[[x[1] for x in self.pids].index(pid)][0]), "rb") as file:
+                prob_data = pickle.load(file)
+            with open(submit_path, "w") as file:
                 file.write(code)
 
+            inpath = os.path.join(self.parent, "grader", "in")
+            outpath = os.path.join(self.parent, "grader", "out")
+            for indata, outdata in prob_data["cases"]:
+                with open(inpath, "w") as file:
+                    file.write(indata)
+                with open(outpath, "w") as file:
+                    file.close()
+
+                with open(inpath, "r") as infile, open(outpath, "w") as outfile:
+                    if lang == 1:
+                        subprocess.Popen(["python3", submit_path], stdin=infile, stdout=outfile)
+
     def load_problems(self):
-        for file in os.listdir(os.path.join(self.parent, "problems")):
+        for filepath in os.listdir(os.path.join(self.parent, "problems")):
             try:
-                with open(os.path.join(self.parent, "problems", file), "rb") as file:
+                with open(os.path.join(self.parent, "problems", filepath), "rb") as file:
                     data = pickle.load(file)
-                self.pids.append(data["pid"])
+                self.pids.append((filepath, data["pid"]))
             except:
                 pass
 
     def grade(self, client, pid, lang, code):
-        if not pid in self.pids:
+        if not pid in [x[1] for x in self.pids]:
             return {"status": False, "error": "Invalid PID."}
         if not lang in self.supported_langs:
             return {"status": False, "error": "Invalid language."}
