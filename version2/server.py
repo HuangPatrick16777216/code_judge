@@ -56,6 +56,10 @@ class Server:
 
 
 class Client:
+    header = 64
+    padding = " " * header
+    packet_size = 1024
+
     def __init__(self, conn, addr):
         self.conn = conn
         self.addr = addr
@@ -91,10 +95,31 @@ class Client:
         print(f"{color}[{self.addr}] {msg}{Fore.RESET}")
 
     def send(self, obj):
-        pass
+        data = pickle.dumps(obj)
+        len_msg = (str(len(data)) + self.padding)[:self.header].encode()
+
+        packets = []
+        while data:
+            curr_len = min(len(data), self.packet_size)
+            packets.append(data[:curr_len])
+            data = data[curr_len:]
+
+        self.conn.send(len_msg)
+        for packet in packets:
+            self.conn.send(packet)
 
     def recv(self):
-        pass
+        len_msg = b""
+        while len(len_msg) < self.header:
+            len_msg += self.conn.recv(self.header-len(len_msg))
+
+        length = int(len_msg)
+        data = b""
+        while len(data) < length:
+            curr_len = min(self.packet_size, self.header-len(data))
+            data += self.conn.recv(curr_len)
+
+        return pickle.loads(data)
 
 
 def main():
