@@ -123,11 +123,17 @@ def main():
                         msg = str(case)
                         msg += " " * (6-len(msg))
                         sys.stdout.write(msg)
+                    sys.stdout.write("\n")
+                    sys.stdout.flush()
                     for case in range(num_cases):
                         result = conn.recv()["result"]
                         color = Fore.GREEN if result == "c" else Fore.RED
                         msg = result + " "*5
-                        print(f"{color}{msg}{Fore.RESET}")
+
+                        sys.stdout.write(f"{color}{msg}{Fore.RESET}")
+                        sys.stdout.flush()
+                    sys.stdout.write("\n")
+                    sys.stdout.flush()
 
                 else:
                     print("The server sent an error: "+reply["error"])
