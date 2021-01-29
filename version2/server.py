@@ -22,6 +22,7 @@
 #! Use at your own risk
 #! The GPL license does not provide any warranty, and the author(s) of this project
 #! shall not be held responsible from any damage directly or indirectly caused by it.
+#! You can consider running the server on a user who does not have access to any valuable files.
 
 import os
 import subprocess
