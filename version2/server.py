@@ -25,6 +25,7 @@
 #! You can consider running the server on a user who does not have access to any valuable files.
 
 import os
+import time
 import subprocess
 import random
 import socket
@@ -145,15 +146,34 @@ class Client:
 
 
 class Grader:
+    parent = os.path.realpath(os.path.dirname(__file__))
     supported_langs = (1, 2, 3)
 
     def __init__(self):
         self.queue = []
         self.pids = []
+
+        os.makedirs(os.path.join(self.parent, "grader"), exist_ok=True)
         self.load_problems()
+        threading.Thread(target=self.grader).start()
+
+    def grader(self):
+        while True:
+            while len(self.queue) == 0:
+                time.sleep(0.01)
+
+            client, pid, lang, code = self.queue.pop(0)
+            with open(os.path.join(self.parent, "grader", "submission"), "w") as file:
+                file.write(code)
 
     def load_problems(self):
-        pass
+        for file in os.listdir(os.path.join(self.parent, "problems")):
+            try:
+                with open(os.path.join(self.parent, "problems", file), "r") as file:
+                    data = pickle.load(file)
+                self.pids.append(data["pid"])
+            except:
+                pass
 
     def grade(self, client, pid, lang, code):
         if not pid in self.pids:
