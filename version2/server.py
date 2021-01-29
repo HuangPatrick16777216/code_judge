@@ -100,8 +100,10 @@ class Client:
                 result = self.grader.grade(self, pid, lang, code)
                 if result["status"]:
                     self.send({"type": "submit", "status": True})
+                    self.alert("INFO", "Submitted a solution")
                 else:
                     self.send({"type": "submit", "status": False, "error": result["error"]})
+                    self.alert("WARNING", "Submitted with error "+result["error"])
 
     def alert(self, type, msg):
         color = Fore.RESET
