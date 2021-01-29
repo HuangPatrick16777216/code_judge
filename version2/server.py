@@ -25,11 +25,14 @@
 
 import os
 import subprocess
+import string
+import random
 import socket
 import threading
 import pickle
 import colorama
 from colorama import Fore
+from hashlib import sha256
 colorama.init()
 
 
@@ -61,6 +64,18 @@ class Client:
         self.auth()
         threading.Thread(target=self.start).start()
 
+    def auth(self):
+        task = "".join(random.choices(bytes(range(256)), k=64)).encode()
+        answer = sha256(task).hexdigest()
+        self.send({"type": "auth"})
+        reply = self.recv()["answer"]
+        if answer == reply:
+            self.alert("INFO", "Authenticated")
+        else:
+            self.alert("ERROR", "Authentication failed")
+            self.send({"type": "quit"})
+            self.conn.close()
+
     def start(self):
         pass
 
@@ -74,6 +89,12 @@ class Client:
             color = Fore.RED
 
         print(f"{color}[{self.addr}] {msg}{Fore.RESET}")
+
+    def send(self, obj):
+        pass
+
+    def recv(self):
+        pass
 
 
 def main():
