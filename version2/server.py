@@ -67,6 +67,7 @@ class Client:
         self.conn = conn
         self.addr = addr
         self.grader = grader
+        self.active = True
 
         self.alert("INFO", "Connected")
         self.auth()
@@ -89,6 +90,7 @@ class Client:
             msg = self.recv()
 
             if msg["type"] == "quit":
+                self.active = False
                 self.conn.close()
                 self.alert("INFO", "Disconnected")
                 return
@@ -169,7 +171,7 @@ class Grader:
     def load_problems(self):
         for file in os.listdir(os.path.join(self.parent, "problems")):
             try:
-                with open(os.path.join(self.parent, "problems", file), "r") as file:
+                with open(os.path.join(self.parent, "problems", file), "rb") as file:
                     data = pickle.load(file)
                 self.pids.append(data["pid"])
             except:
