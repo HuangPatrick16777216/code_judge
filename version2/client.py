@@ -72,6 +72,12 @@ class Client:
         return pickle.loads(data)
 
 
+def clearline():
+    sys.stdout.write("\r")
+    sys.stdout.write(" "*80)
+    sys.stdout.write("\r")
+
+
 def main():
     if os.path.isfile("settings.json"):
         with open("settings.json", "r") as file:
@@ -128,11 +134,13 @@ def main():
                     results = []
 
                     for i in range(num_cases):
-                        sys.stdout.write(f"\rGrading case {i+1} of {num_cases}...")
+                        clearline()
+                        sys.stdout.write(f"Grading case {i+1} of {num_cases}...")
                         sys.stdout.flush()
                         results.append(conn.recv())
 
-                    sys.stdout.write("\rGrading finished. Results are below. * = correct, x = wrong.")
+                    clearline()
+                    sys.stdout.write("Grading finished. Results are below. * = correct, x = wrong.\n")
                     for i in range(num_cases):
                         sys.stdout.write("+-------")
                     sys.stdout.write("+\n")
@@ -151,7 +159,10 @@ def main():
                             sys.stdout.write(" "*(7-offset-len(elapse)))
                         else:
                             sys.stdout.write("       ")
-                    sys.stdout.write("\n")
+                    sys.stdout.write("|\n")
+                    for i in range(num_cases):
+                        sys.stdout.write("+-------")
+                    sys.stdout.write("+\n")
                     sys.stdout.flush()
                     input("Press enter to clear.")
 
