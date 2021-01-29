@@ -81,8 +81,15 @@ def main():
         ip = input("IP: ")
 
     conn = Client(ip, 5555)
+    if sys.platform == "linux":
+        clear = lambda: os.system("clear")
+    elif sys.platform == "windows":
+        clear = lambda: os.system("cls")
+    else:
+        clear = lambda: None
 
     while True:
+        clear()
         print("s: submit a solution")
         print("q: quit")
         action = input("Action: ")
@@ -92,7 +99,7 @@ def main():
             return
 
         elif action == "s":
-            print()
+            clear()
             print("1: Python 3.8.0")
             print("2: Python 2.7.17")
             print("3: C++ (g++ 7.5.0)")
@@ -113,27 +120,40 @@ def main():
                 conn.send(data)
 
                 reply = conn.recv()
-                print()
                 if reply["status"]:
-                    print("Your submission is in the server queue and will be graded shortly.")
+                    clear()
+                    sys.stdout.write("Your submission is in the server queue and will be graded shortly.")
+                    sys.stdout.flush()
                     num_cases = conn.recv()["num_cases"]
-                    print(f"Total {num_cases} cases")
-                    print(f"c = correct, e = empty output, x = wrong")
-                    for case in range(num_cases):
-                        msg = str(case)
-                        msg += " " * (6-len(msg))
-                        sys.stdout.write(msg)
-                    sys.stdout.write("\n")
-                    sys.stdout.flush()
-                    for case in range(num_cases):
-                        result = conn.recv()["result"]
-                        color = Fore.GREEN if result == "c" else Fore.RED
-                        msg = result + " "*5
+                    results = []
 
-                        sys.stdout.write(f"{color}{msg}{Fore.RESET}")
+                    for i in range(num_cases):
+                        sys.stdout.write(f"\rGrading case {i+1} of {num_cases}...")
                         sys.stdout.flush()
+                        results.append(conn.recv())
+
+                    sys.stdout.write("\rGrading finished. Results are below. * = correct, x = wrong.")
+                    for i in range(num_cases):
+                        sys.stdout.write("+-------")
+                    sys.stdout.write("+\n")
+                    for result in results:
+                        symbol = "*" if result["result"] == "c" else "x"
+                        color = Fore.GREEN if symbol == "*" else Fore.RED
+                        sys.stdout.write(f"|   {color}{symbol}{Fore.RESET}   ")
+                    sys.stdout.write("|\n")
+                    for result in results:
+                        sys.stdout.write("|")
+                        if result["result"] == "c":
+                            elapse = str(int(result["elapse"])) + " ms"
+                            offset = int((7-len(elapse)) / 2)
+                            sys.stdout.write(" "*offset)
+                            sys.stdout.write(elapse)
+                            sys.stdout.write(" "*(7-offset-len(elapse)))
+                        else:
+                            sys.stdout.write("       ")
                     sys.stdout.write("\n")
                     sys.stdout.flush()
+                    input("Press enter to clear.")
 
                 else:
                     print("The server sent an error: "+reply["error"])
