@@ -26,7 +26,6 @@
 
 import os
 import subprocess
-import string
 import random
 import socket
 import threading
@@ -39,9 +38,10 @@ colorama.init()
 
 
 class Server:
-    def __init__(self, ip, port):
+    def __init__(self, ip, port, grader):
         self.ip = ip
         self.port = port
+        self.grader = grader
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server.bind((ip, port))
 
@@ -53,7 +53,7 @@ class Server:
 
         while True:
             conn, addr = self.server.accept()
-            client = Client(conn, addr)
+            client = Client(conn, addr, self.grader)
             self.clients.append(client)
 
 
@@ -62,9 +62,10 @@ class Client:
     padding = " " * header
     packet_size = 1024
 
-    def __init__(self, conn, addr):
+    def __init__(self, conn, addr, grader):
         self.conn = conn
         self.addr = addr
+        self.grader = grader
 
         self.alert("INFO", "Connected")
         self.auth()
@@ -90,6 +91,17 @@ class Client:
                 self.conn.close()
                 self.alert("INFO", "Disconnected")
                 return
+
+            elif msg["type"] == "submit":
+                pid = msg["pid"]
+                lang = msg["lang"]
+                code = msg["code"]
+
+                result = self.grader.grade(self, pid, lang, code)
+                if result["status"]:
+                    self.send({"type": "submit", "status": True})
+                else:
+                    self.send({"type": "submit", "status": False, "error": result["error"]})
 
     def alert(self, type, msg):
         color = Fore.RESET
@@ -130,6 +142,27 @@ class Client:
         return pickle.loads(data)
 
 
+class Grader:
+    supported_langs = (1, 2, 3)
+
+    def __init__(self):
+        self.queue = []
+        self.pids = []
+        self.load_problems()
+
+    def load_problems(self):
+        pass
+
+    def grade(self, client, pid, lang, code):
+        if not pid in self.pids:
+            return {"status": False, "error": "Invalid PID."}
+        if not lang in self.supported_langs:
+            return {"status": False, "error": "Invalid language."}
+
+        self.queue.append((client, pid, lang, code))
+        return {"status": True}
+
+
 def main():
     if os.path.isfile("settings.json"):
         with open("settings.json", "r") as file:
@@ -138,7 +171,8 @@ def main():
     else:
         ip = input("IP: ")
 
-    server = Server(ip, 5555)
+    grader = Grader()
+    server = Server(ip, 5555, grader)
     server.start()
 
 
