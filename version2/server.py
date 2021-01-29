@@ -197,15 +197,17 @@ class Grader:
                         elif lang == 2:
                             commands = ["python2", submit_path]
 
-                        if commands is not None:
-                            subprocess.Popen(commands, stdin=in_file, stdout=out_file)
-                            elapse = time.time() - time_start
+                        if commands is None:
+                            continue
+
+                        subprocess.Popen(commands, stdin=in_file, stdout=out_file)
+                        elapse = time.time() - time_start
 
                     time.sleep(0.05)
                     with open(out_path, "r") as file:
                         ans = file.read()
                     result = "c" if ans.strip() == out_data.strip() else "x"
-                    client.send({"type": "submit", "result": result})
+                    client.send({"type": "submit", "result": result, "elapse": elapse})
 
             except Exception as e:
                 print(f"Error in grading: {e}")
