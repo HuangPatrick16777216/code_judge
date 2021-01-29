@@ -173,10 +173,10 @@ class Grader:
                 in_path = os.path.join(self.parent, "grader", "in")
                 out_path = os.path.join(self.parent, "grader", "out")
                 data_path = os.path.join(self.parent, "problems", self.pids[[x[1] for x in self.pids].index(pid)][0])
-                submit_save_path = "0"
+                submit_save_path = 0
                 if len(os.listdir(submissions_path)) > 0:
-                    submit_save_path = str(max(map(int, os.listdir(submissions_path)))+1)
-                submit_save_path = os.path.join(self.parent, "submissions", submit_save_path)
+                    submit_save_path = max(map(lambda x: int(x.split(".")[0]), os.listdir(submissions_path))) + 1
+                submit_save_path = os.path.join(self.parent, "submissions", str(submit_save_path)+".json")
 
                 with open(data_path, "rb") as file:
                     prob_data = pickle.load(file)
