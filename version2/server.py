@@ -80,11 +80,16 @@ class Client:
             self.alert("INFO", "Authenticated")
         else:
             self.alert("ERROR", "Authentication failed")
-            self.send({"type": "quit"})
             self.conn.close()
 
     def start(self):
-        pass
+        while True:
+            msg = self.recv()
+
+            if msg["type"] == "quit":
+                self.conn.close()
+                self.alert("INFO", "Disconnected")
+                return
 
     def alert(self, type, msg):
         color = Fore.RESET
