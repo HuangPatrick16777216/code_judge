@@ -20,6 +20,8 @@ import socket
 import pickle
 import json
 from hashlib import sha256
+from tkinter import Tk
+from tkinter.filedialog import askopenfilename
 
 
 class Client:
@@ -74,6 +76,37 @@ def main():
         ip = input("IP: ")
 
     conn = Client(ip, 5555)
+
+    while True:
+        print("s: submit a solution")
+        print("q: quit")
+        action = input("Action: ")
+
+        if action == "q":
+            conn.send({"type": "quit"})
+            return
+
+        elif action == "s":
+            print()
+            print("1: Python 3.8.0")
+            print("2: Python 2.7.17")
+            print("3: C++ (g++ 7.5.0)")
+            lang = int(input("Language: "))
+            pid = int(input("Problem ID: "))
+            path = askopenfilename()
+
+            if os.path.isfile(path):
+                with open(path, "r") as file:
+                    code = file.read()
+
+                data = {
+                    "type": "submit",
+                    "lang": lang,
+                    "pid": pid,
+                    "code": code,
+                }
+                conn.send(data)
+                reply = conn.recv()
 
 
 main()
