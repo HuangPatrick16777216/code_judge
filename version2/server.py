@@ -30,6 +30,7 @@ import random
 import socket
 import threading
 import pickle
+import json
 import colorama
 from colorama import Fore
 from hashlib import sha256
@@ -124,7 +125,14 @@ class Client:
 
 
 def main():
-    server = Server(input("IP: "), 5555)
+    if os.path.isfile("settings.json"):
+        with open("settings.json", "r") as file:
+            data = json.load(file)
+            ip = data["ip"]
+    else:
+        ip = input("IP: ")
+
+    server = Server(ip, 5555)
     server.start()
 
 
