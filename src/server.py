@@ -109,6 +109,10 @@ class Client:
                     self.send({"type": "submit", "status": False, "error": result["error"]})
                     self.alert("WARNING", "Submitted with error "+result["error"])
 
+            elif msg["type"] == "get_problems":
+                problems = self.grader.get_problems()
+                self.send({"type": "get_problems", "problems": problems})
+
     def alert(self, type, msg):
         color = Fore.RESET
         if type == "INFO":
@@ -260,6 +264,14 @@ class Grader:
 
         self.queue.append((client, pid, lang, code))
         return {"status": True}
+
+    def get_problems(self):
+        problems = []
+        for path, pid in self.pids:
+            with open(os.path.join(self.parent, "problems", path), "rb") as file:
+                data = pickle.load(file)
+            problems.append((pid, data["name"], data["difficulty"], len(data["cases"])))
+        return problems
 
 
 def main():
