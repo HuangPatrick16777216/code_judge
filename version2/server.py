@@ -202,7 +202,6 @@ class Grader:
                     with open(out_path, "w") as file:
                         file.close()
 
-                    time.sleep(0.2)
                     with open(in_path, "r") as in_file, open(out_path, "w") as out_file, open(err_path, "w") as err_file:
                         if lang not in self.supported_langs:
                             continue
@@ -216,10 +215,10 @@ class Grader:
                         elif lang == 3:
                             commands = [compiled_path]
 
-                        subprocess.Popen(commands, stdin=in_file, stdout=out_file, stderr=err_file)
+                        p = subprocess.Popen(commands, stdin=in_file, stdout=out_file, stderr=err_file)
+                        p.wait()
                         elapse = time.time() - time_start
 
-                    time.sleep(0.2)
                     with open(err_path, "r") as file:
                         err = file.read()
                     if err.strip() != "":
