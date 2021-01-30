@@ -1,2 +1,2 @@
-# code_judge
-Command line code judge.
+# Code Judge
+Command line code judge
