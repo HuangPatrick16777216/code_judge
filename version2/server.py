@@ -18,7 +18,7 @@
 #! ##### WARNING: #####
 #! The server judge will execute files submitted by users.
 #! If those files contain malicious code, your system may be messed up.
-#! At the time of this writing, there is nothing to prevent this.
+#! At the time of this writing, there is no code to check for this.
 #! Use at your own risk
 #! The GPL license does not provide any warranty, and the author(s) of this project
 #! shall not be held responsible from any damage directly or indirectly caused by it.
@@ -177,6 +177,8 @@ class Grader:
                 if len(os.listdir(submissions_path)) > 0:
                     submit_save_path = max(map(lambda x: int(x.split(".")[0]), os.listdir(submissions_path))) + 1
                 submit_save_path = os.path.join(self.parent, "submissions", str(submit_save_path)+".json")
+                if lang == 3:
+                    submit_path += ".cpp"
 
                 with open(data_path, "rb") as file:
                     prob_data = pickle.load(file)
@@ -186,7 +188,8 @@ class Grader:
                 with open(submit_save_path, "w") as file:
                     json.dump({"from": client.addr, "code": code}, file, indent=4)
 
-                # Compile files here
+                if lang == 3:
+                    os.system(f"g++ {submit_path} -o {compiled_path}")
 
                 client.send({"type": "submit", "num_cases": len(prob_data["cases"])})
 
@@ -205,6 +208,8 @@ class Grader:
                             commands = ["python3", submit_path]
                         elif lang == 2:
                             commands = ["python2", submit_path]
+                        elif lang == 3:
+                            commands = [compiled_path]
 
                         if commands is None:
                             continue
