@@ -1,6 +1,6 @@
 *.pyc
-tests
 *settings.json
+
 version2/problems
 version2/grader
 version2/solutions
