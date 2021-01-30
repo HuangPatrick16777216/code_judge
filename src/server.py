@@ -247,7 +247,8 @@ class Grader:
             try:
                 with open(os.path.join(self.parent, "problems", filepath), "rb") as file:
                     data = pickle.load(file)
-                self.pids.append((filepath, data["pid"]))
+                if data["pid"] not in [x[1] for x in self.pids]:
+                    self.pids.append((filepath, data["pid"]))
             except:
                 pass
 
