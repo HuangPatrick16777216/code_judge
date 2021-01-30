@@ -117,14 +117,7 @@ def main():
                 with open(path, "r") as file:
                     code = file.read()
 
-                data = {
-                    "type": "submit",
-                    "lang": lang,
-                    "pid": pid,
-                    "code": code,
-                }
-                conn.send(data)
-
+                conn.send({"type": "submit", "lang": lang, "pid": pid, "code": code})
                 reply = conn.recv()
                 if reply["status"]:
                     clear()
