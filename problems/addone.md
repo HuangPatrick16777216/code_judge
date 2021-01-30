@@ -3,24 +3,24 @@
 * Author: Patrick Huang
 * License: GPL
 
-# Description
+## Description
 Add one to an integer, `N`
 
-# Input Format
+## Input Format
 A single integer specifying `N`
 
-# Output Format
+## Output Format
 A single integer specifying `N+1`
 
-# Constraints
-`0 <= **N** < 100000`
+## Constraints
+`0 <= N < 100000`
 
-# Sample Input
+## Sample Input
 ```
 1
 ```
 
-# Sample Output
+## Sample Output
 ```
 2
 ```
