@@ -44,6 +44,6 @@ They **must** be made with Python, due to the built in pickle module.
 }
 ```
 * `name` is the name of your problem.
-* `pid` is the problem's unique ID.
+* `pid` is the problem's unique ID. If a PID comes up a second time, it will be skipped.
 * `difficulty` is a number to tell the contestants roughly how difficult the problem is. The difficulty value is not used by the server, and you can use any scale you like.
 * `cases` is a list of (input, output) strings, communicated via stdin/stdout. Each entry in the list is one case.
