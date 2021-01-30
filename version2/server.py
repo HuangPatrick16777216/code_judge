@@ -35,6 +35,7 @@ import json
 import colorama
 from colorama import Fore
 from hashlib import sha256
+from datetime import datetime
 colorama.init()
 
 
@@ -186,7 +187,7 @@ class Grader:
                     file.write(code)
 
                 with open(submit_save_path, "w") as file:
-                    json.dump({"from": client.addr, "code": code}, file, indent=4)
+                    json.dump({"from": client.addr, "time": str(datetime.now()), "code": code}, file, indent=4)
 
                 if lang == 3:
                     os.system(f"g++ {submit_path} -o {compiled_path}")
