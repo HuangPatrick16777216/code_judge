@@ -202,18 +202,17 @@ class Grader:
 
                     time.sleep(0.1)
                     with open(in_path, "r") as in_file, open(out_path, "w") as out_file:
+                        if lang not in self.supported_langs:
+                            continue
+
                         commands = None
                         time_start = time.time()
-
                         if lang == 1:
                             commands = ["python3", submit_path]
                         elif lang == 2:
                             commands = ["python2", submit_path]
                         elif lang == 3:
                             commands = [compiled_path]
-
-                        if commands is None:
-                            continue
 
                         subprocess.Popen(commands, stdin=in_file, stdout=out_file)
                         elapse = time.time() - time_start
@@ -237,9 +236,9 @@ class Grader:
                 pass
 
     def grade(self, client, pid, lang, code):
-        if not pid in [x[1] for x in self.pids]:
+        if pid not in [x[1] for x in self.pids]:
             return {"status": False, "error": "Invalid PID."}
-        if not lang in self.supported_langs:
+        if lang not in self.supported_langs:
             return {"status": False, "error": "Invalid language."}
 
         self.queue.append((client, pid, lang, code))
