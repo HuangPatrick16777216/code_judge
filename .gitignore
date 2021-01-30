@@ -3,7 +3,7 @@
 
 problem_gen
 
-version2/problems
-version2/grader
-version2/solutions
-version2/submissions
+src/problems
+src/grader
+src/solutions
+src/submissions
