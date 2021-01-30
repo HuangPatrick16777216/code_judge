@@ -173,6 +173,7 @@ class Grader:
                 compiled_path = os.path.join(self.parent, "grader", "compiled")
                 in_path = os.path.join(self.parent, "grader", "in")
                 out_path = os.path.join(self.parent, "grader", "out")
+                err_path = os.path.join(self.parent, "grader", "err")
                 data_path = os.path.join(self.parent, "problems", self.pids[[x[1] for x in self.pids].index(pid)][0])
                 submit_save_path = 0
                 if len(os.listdir(submissions_path)) > 0:
@@ -194,14 +195,15 @@ class Grader:
 
                 client.send({"type": "submit", "num_cases": len(prob_data["cases"])})
 
-                for in_data, out_data in prob_data["cases"]:
+                for i, data in enumerate(prob_data["cases"]):
+                    in_data, out_data = data
                     with open(in_path, "w") as file:
                         file.write(in_data)
                     with open(out_path, "w") as file:
                         file.close()
 
                     time.sleep(0.2)
-                    with open(in_path, "r") as in_file, open(out_path, "w") as out_file:
+                    with open(in_path, "r") as in_file, open(out_path, "w") as out_file, open(err_path, "w") as err_file:
                         if lang not in self.supported_langs:
                             continue
 
@@ -214,10 +216,16 @@ class Grader:
                         elif lang == 3:
                             commands = [compiled_path]
 
-                        subprocess.Popen(commands, stdin=in_file, stdout=out_file)
+                        subprocess.Popen(commands, stdin=in_file, stdout=out_file, stderr=err_file)
                         elapse = time.time() - time_start
 
                     time.sleep(0.2)
+                    with open(err_path, "r") as file:
+                        err = file.read()
+                    if err.strip() != "":
+                        client.send({"type": "submit", "result": "!", "error": err})
+                        if i == 0:
+                            break
                     with open(out_path, "r") as file:
                         ans = file.read()
                     result = "c" if ans.strip() == out_data.strip() else "x"
