@@ -156,7 +156,7 @@ def main():
                     for result in results:
                         sys.stdout.write("|")
                         if result["result"] == "*":
-                            elapse = str(int(result["elapse"])) + " ms"
+                            elapse = str(int(result["elapse"]*1000)) + " ms"
                             offset = int((7-len(elapse)) / 2)
                             sys.stdout.write(" "*offset)
                             sys.stdout.write(elapse)
