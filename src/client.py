@@ -110,10 +110,17 @@ def main():
             print("2: Python 2.7.17")
             print("3: C++ (g++ 7.5.0)")
             lang = int(input("Language: "))
-            pid = int(input("Problem ID: "))
-            path = askopenfilename()
 
-            if os.path.isfile(path):
+            clear()
+            conn.send({"type": "get_problems"})
+            problems = conn.recv()
+            print("ID: Name, Difficulty, Number of cases")
+            for pid, name, difficult, num_cases in problems:
+                print(f"{pid}: {name}, {difficult}, {num_cases}")
+            pid = int(input("Problem ID: "))
+
+            path = askopenfilename()
+            if path and os.path.isfile(path):
                 with open(path, "r") as file:
                     code = file.read()
 
@@ -140,9 +147,9 @@ def main():
                             input("Press enter to clear.")
                             errored = True
                             break
-
                     if errored:
                         continue
+
                     clearline()
                     sys.stdout.write("Grading finished. Results are below.\n")
                     sys.stdout.write("* = correct\n")
