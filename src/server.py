@@ -111,6 +111,7 @@ class Client:
 
             elif msg["type"] == "get_problems":
                 problems = self.grader.get_problems()
+                problems = sorted(problems, key=lambda x: x[0])
                 self.send({"type": "get_problems", "problems": problems})
 
     def alert(self, type, msg):
