@@ -126,19 +126,30 @@ def main():
                     num_cases = conn.recv()["num_cases"]
                     results = []
 
+                    errored = False
                     for i in range(num_cases):
                         clearline()
                         sys.stdout.write(f"Grading case {i+1} of {num_cases}...")
                         sys.stdout.flush()
-                        results.append(conn.recv())
+                        curr_result = conn.recv()
+                        results.append(curr_result)
+                        if curr_result["result"] == "!" and i == 0:
+                            clearline()
+                            print("Error when grading case 1:")
+                            print(curr_result["error"])
+                            input("Press enter to clear.")
+                            errored = True
+                            break
 
+                    if errored:
+                        continue
                     clearline()
                     sys.stdout.write("Grading finished. Results are below. * = correct, x = wrong.\n")
                     for i in range(num_cases):
                         sys.stdout.write("+-------")
                     sys.stdout.write("+\n")
                     for result in results:
-                        symbol = "*" if result["result"] == "c" else "x"
+                        symbol = result["result"]
                         color = Fore.GREEN if symbol == "*" else Fore.RED
                         sys.stdout.write(f"|   {color}{symbol}{Fore.RESET}   ")
                     sys.stdout.write("|\n")
