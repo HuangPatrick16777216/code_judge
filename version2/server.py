@@ -216,7 +216,13 @@ class Grader:
                             commands = [compiled_path]
 
                         p = subprocess.Popen(commands, stdin=in_file, stdout=out_file, stderr=err_file)
-                        p.wait()
+                        timeout = False
+                        while p.poll() is None:
+                            if time.time() - time_start > 3:
+                                p.kill()
+                                timeout = True
+                                break
+
                         elapse = time.time() - time_start
 
                     with open(err_path, "r") as file:
@@ -229,6 +235,8 @@ class Grader:
                     with open(out_path, "r") as file:
                         ans = file.read()
                     result = "*" if ans.strip() == out_data.strip() else "x"
+                    if timeout:
+                        result = "t"
                     client.send({"type": "submit", "result": result, "elapse": elapse})
 
             except Exception as e:
