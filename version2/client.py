@@ -161,6 +161,7 @@ def main():
 
                 else:
                     print("The server sent an error: "+reply["error"])
+                    input("Press enter to continue.")
 
 
 main()
