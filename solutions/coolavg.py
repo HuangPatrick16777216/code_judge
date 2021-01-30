@@ -8,4 +8,4 @@ def solution(nums):
         return solution(new_nums)
 
 input()
-print(solution(list(map(int, input().strip().split()))))
+print(int(solution(list(map(int, input().strip().split())))))
