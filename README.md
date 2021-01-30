@@ -9,6 +9,7 @@ Command line code judge
 
 Required Python modules:
 * `colorama`
+* `tkinter`
 
 ## Setting up the server
 1. Take the server file `src/server.py` and place it in an empty directory.
