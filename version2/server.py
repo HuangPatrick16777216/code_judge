@@ -228,7 +228,7 @@ class Grader:
                             break
                     with open(out_path, "r") as file:
                         ans = file.read()
-                    result = "c" if ans.strip() == out_data.strip() else "x"
+                    result = "*" if ans.strip() == out_data.strip() else "x"
                     client.send({"type": "submit", "result": result, "elapse": elapse})
 
             except Exception as e:
