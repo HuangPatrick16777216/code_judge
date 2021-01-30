@@ -1,6 +1,8 @@
 *.pyc
 *settings.json
 
+problem_gen
+
 version2/problems
 version2/grader
 version2/solutions
