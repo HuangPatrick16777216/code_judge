@@ -113,7 +113,7 @@ def main():
 
             clear()
             conn.send({"type": "get_problems"})
-            problems = conn.recv()
+            problems = conn.recv()["problems"]
             print("ID: Name, Difficulty, Number of cases")
             for pid, name, difficult, num_cases in problems:
                 print(f"{pid}: {name}, {difficult}, {num_cases}")
