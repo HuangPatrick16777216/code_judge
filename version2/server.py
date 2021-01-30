@@ -226,6 +226,7 @@ class Grader:
                         client.send({"type": "submit", "result": "!", "error": err})
                         if i == 0:
                             break
+                        continue
                     with open(out_path, "r") as file:
                         ans = file.read()
                     result = "*" if ans.strip() == out_data.strip() else "x"
