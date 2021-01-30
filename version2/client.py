@@ -144,7 +144,11 @@ def main():
                     if errored:
                         continue
                     clearline()
-                    sys.stdout.write("Grading finished. Results are below. * = correct, x = wrong.\n")
+                    sys.stdout.write("Grading finished. Results are below.\n")
+                    sys.stdout.write("* = correct\n")
+                    sys.stdout.write("x = wrong\n")
+                    sys.stdout.write("! = runtime error\n")
+                    sys.stdout.write("t = time limit exceeded (3 seconds)\n")
                     for i in range(num_cases):
                         sys.stdout.write("+-------")
                     sys.stdout.write("+\n")
