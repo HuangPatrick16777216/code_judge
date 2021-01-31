@@ -38,11 +38,11 @@ from hashlib import sha256
 from datetime import datetime
 colorama.init()
 
-CPP_COMPILE = "g++ {src} -o {out}"
-C_COMPILE = "gcc {src} -o {out}"
-PY3_CMD = "python3.8 {src}"
-PY2_CMD = "python2 {src}"
-GO_CMD = "go run {src}"
+CPP_COMPILE = "g++ {} -o {}"
+C_COMPILE = "gcc {} -o {}"
+PY3_CMD = "python3.8 {}"
+PY2_CMD = "python2 {}"
+GO_CMD = "go run {}"
 
 
 class Server:
@@ -223,13 +223,13 @@ class Grader:
                         commands = None
                         time_start = time.time()
                         if lang == 1:
-                            commands = [PY3_CMD.format(submit_path)]
+                            commands = PY3_CMD.format(submit_path).split()
                         elif lang == 2:
-                            commands = [PY2_CMD.format(submit_path)]
+                            commands = PY2_CMD.format(submit_path).split()
                         elif lang in (3, 4):
                             commands = [compiled_path]
                         elif lang == 5:
-                            commands = [GO_CMD.format(submit_path)]
+                            commands = GO_CMD.format(submit_path).split()
 
                         p = subprocess.Popen(commands, stdin=in_file, stdout=out_file, stderr=err_file)
                         timeout = False
