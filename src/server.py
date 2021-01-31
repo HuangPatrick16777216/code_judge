@@ -354,7 +354,7 @@ def main():
     console = Console(server)
     grader.console = console
     threading.Thread(target=server.start).start()
-    console.start()
+    #console.start()
 
 
 main()
