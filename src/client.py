@@ -78,6 +78,55 @@ def clearline():
     sys.stdout.write("\r")
 
 
+def print_results(results):
+    if not len(results) > 0:
+        return
+
+    rows = []
+    curr_row = []
+    for i in range(len(results)):
+        curr_row.append(results[i])
+        if i % 5 == 4:
+            rows.append(curr_row)
+            curr_row = []
+    if len(curr_row) > 0:
+        rows.append(curr_row)
+
+    sys.stdout.write("+")
+    for i, row in enumerate(rows):
+        if i == 0:
+            for j in range(len(row)):
+                sys.stdout.write("---------+")
+
+        sys.stdout.write("\n|")
+        for j in range(len(row)):
+            msg = str(j+1 + 5*i)
+            msg = "    " + msg + " "*(5-len(msg))
+            sys.stdout.write(msg+"|")
+
+        sys.stdout.write("\n|")
+        for result in row:
+            symbol = result["result"]
+            color = Fore.GREEN if symbol == "*" else Fore.RED
+            sys.stdout.write(f"    {color}{symbol}{Fore.RESET}    |")
+
+        sys.stdout.write("\n|")
+        for result in row:
+            if result["result"] == "*":
+                time = str(int(result["elapse"])*1000) + " ms"
+                offset = int((9-len(time))/2)
+                msg = " "*offset + time
+                msg += " " * (9-len(msg))
+                sys.stdout.write(msg + "|")
+
+        sys.stdout.write("\n+")
+        for j in range(len(row)):
+            sys.stdout.write("---------+")
+
+    sys.stdout.write("\n")
+    sys.stdout.flush()
+
+
 def main():
     if os.path.isfile("settings.json"):
         with open("settings.json", "r") as file:
@@ -138,54 +187,26 @@ def main():
                         print("Compilation error. Aborting.")
                         input("Press enter to clear.")
                         continue
-                    results = []
 
-                    errored = False
+                    results = []
+                    clear()
+                    print("Grading in progress...")
                     for i in range(num_cases):
-                        clearline()
-                        sys.stdout.write(f"Grading case {i+1} of {num_cases}...")
-                        sys.stdout.flush()
                         curr_result = conn.recv()
                         results.append(curr_result)
+                        clear()
+                        print("Grading in progress...")
+                        print_results(results)
                         if curr_result["result"] == "!" and i == 0:
-                            clearline()
+                            clear()
                             print("Error when grading case 1:")
                             print(curr_result["error"])
                             input("Press enter to clear.")
-                            errored = True
                             break
-                    if errored:
-                        continue
 
-                    clearline()
-                    sys.stdout.write("Grading finished. Results are below.\n")
-                    sys.stdout.write("* = correct\n")
-                    sys.stdout.write("x = wrong\n")
-                    sys.stdout.write("! = runtime error\n")
-                    sys.stdout.write("t = time limit exceeded (3 seconds)\n")
-                    for i in range(num_cases):
-                        sys.stdout.write("+-------")
-                    sys.stdout.write("+\n")
-                    for result in results:
-                        symbol = result["result"]
-                        color = Fore.GREEN if symbol == "*" else Fore.RED
-                        sys.stdout.write(f"|   {color}{symbol}{Fore.RESET}   ")
-                    sys.stdout.write("|\n")
-                    for result in results:
-                        sys.stdout.write("|")
-                        if result["result"] == "*":
-                            elapse = str(int(result["elapse"]*1000)) + " ms"
-                            offset = int((7-len(elapse)) / 2)
-                            sys.stdout.write(" "*offset)
-                            sys.stdout.write(elapse)
-                            sys.stdout.write(" "*(7-offset-len(elapse)))
-                        else:
-                            sys.stdout.write("       ")
-                    sys.stdout.write("|\n")
-                    for i in range(num_cases):
-                        sys.stdout.write("+-------")
-                    sys.stdout.write("+\n")
-                    sys.stdout.flush()
+                    clear()
+                    print("Grading finished. Results are below.")
+                    print_results(results)
                     input("Press enter to clear.")
 
                 else:
