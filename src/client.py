@@ -195,6 +195,7 @@ def main():
                     results = []
                     clear()
                     print("Grading in progress...")
+                    errored = False
                     for i in range(num_cases):
                         curr_result = conn.recv()
                         results.append(curr_result)
@@ -206,12 +207,13 @@ def main():
                             print("Error when grading case 1:")
                             print(curr_result["error"])
                             input("Press enter to clear.")
-                            break
+                            errored = True
 
-                    clear()
-                    print("Grading finished. Results are below.")
-                    print_results(results)
-                    input("Press enter to clear.")
+                    if not errored:
+                        clear()
+                        print("Grading finished. Results are below.")
+                        print_results(results)
+                        input("Press enter to clear.")
 
                 else:
                     print("The server sent an error: "+reply["error"])
