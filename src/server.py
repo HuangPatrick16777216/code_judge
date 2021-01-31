@@ -38,6 +38,12 @@ from hashlib import sha256
 from datetime import datetime
 colorama.init()
 
+CPP_COMPILE = "g++ {src} -o {out}"
+C_COMPILE = "gcc {src} -o {out}"
+PY3_CMD = "python3.8 {src}"
+PY2_CMD = "python2 {src}"
+GO_CMD = "go run {src}"
+
 
 class Server:
     def __init__(self, ip, port, grader):
@@ -155,7 +161,7 @@ class Client:
 
 class Grader:
     parent = os.path.realpath(os.path.dirname(__file__))
-    supported_langs = (1, 2, 3)
+    supported_langs = (1, 2, 3, 4, 5)
 
     def __init__(self):
         self.queue = []
@@ -186,17 +192,20 @@ class Grader:
                 submit_save_path = os.path.join(self.parent, "submissions", str(submit_save_path)+".json")
                 if lang == 3:
                     submit_path += ".cpp"
+                elif lang == 4:
+                    submit_path += ".c"
 
                 with open(data_path, "rb") as file:
                     prob_data = pickle.load(file)
                 with open(submit_path, "w") as file:
                     file.write(code)
-
                 with open(submit_save_path, "w") as file:
                     json.dump({"from": client.addr, "time": str(datetime.now()), "code": code}, file, indent=4)
 
                 if lang == 3:
-                    os.system(f"g++ {submit_path} -o {compiled_path}")
+                    os.system(CPP_COMPILE.format(submit_path, compiled_path))
+                elif lang == 4:
+                    os.system(C_COMPILE.format(submit_path, compiled_path))
 
                 client.send({"type": "submit", "num_cases": len(prob_data["cases"])})
 
@@ -214,11 +223,13 @@ class Grader:
                         commands = None
                         time_start = time.time()
                         if lang == 1:
-                            commands = ["python3", submit_path]
+                            commands = [PY3_CMD.format(submit_path)]
                         elif lang == 2:
-                            commands = ["python2", submit_path]
-                        elif lang == 3:
+                            commands = [PY2_CMD.format(submit_path)]
+                        elif lang in (3, 4):
                             commands = [compiled_path]
+                        elif lang == 5:
+                            commands = [GO_CMD.format(submit_path)]
 
                         p = subprocess.Popen(commands, stdin=in_file, stdout=out_file, stderr=err_file)
                         timeout = False

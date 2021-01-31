@@ -109,6 +109,8 @@ def main():
             print("1: Python 3.8.0")
             print("2: Python 2.7.17")
             print("3: C++ (g++ 7.5.0)")
+            print("4: C (gcc 7.5.0)")
+            print("5: Go")
             lang = int(input("Language: "))
 
             clear()
