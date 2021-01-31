@@ -63,7 +63,8 @@ class Server:
 
         while True:
             conn, addr = self.server.accept()
-            client = Client(conn, addr, self.grader, self.password)
+            client = Client(conn, addr, self.grader)
+            threading.Thread(target=client.init, args=(self.password,)).start()
             self.clients.append(client)
 
 
@@ -72,32 +73,36 @@ class Client:
     padding = " " * header
     packet_size = 1024
 
-    def __init__(self, conn, addr, grader, password):
+    def __init__(self, conn, addr, grader):
         self.conn = conn
         self.addr = addr
         self.grader = grader
         self.active = True
 
+    def init(self, password):
         self.alert("INFO", "Connected")
-        self.auth(password)
-        threading.Thread(target=self.start).start()
+        if self.auth(password):
+            threading.Thread(target=self.start).start()
 
     def auth(self, password):
         chars = bytes(range(256))
         task = b"".join(random.choices([chars[i:i+1] for i in range(len(chars))], k=64))
         answer = sha256(task).hexdigest()
         self.send({"type": "auth", "task": task, "password": password != ""})
+
         reply = self.recv()
         if answer == reply["answer"]:
             self.alert("INFO", "Authenticated")
         else:
             self.alert("ERROR", "Authentication failed")
             self.conn.close()
-            return
+            return False
         if password != "" and reply["password"] != password:
             self.alert("ERROR", "Wrong password")
             self.conn.close()
-            return
+            return False
+
+        return True
 
     def start(self):
         while True:
