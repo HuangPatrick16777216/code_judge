@@ -32,6 +32,7 @@ import socket
 import threading
 import pickle
 import json
+import ctypes
 import colorama
 from colorama import Fore
 from hashlib import sha256
@@ -71,6 +72,10 @@ class Server:
             client = Client(conn, addr, self.grader)
             threading.Thread(target=client.init, args=(self.password,)).start()
             self.clients.append(client)
+
+    def quit(self):
+        for c in self.clients:
+            c.quit()
 
 
 class Client:
@@ -174,6 +179,9 @@ class Client:
             data += self.conn.recv(curr_len)
 
         return pickle.loads(data)
+
+    def quit(self):
+        self.conn.close()
 
 
 class Grader:
@@ -318,9 +326,15 @@ class Console:
         else:
             self.stats = {"submissions": {}}
 
+        self.server = server
+
     def start(self):
         while True:
             cmd = input().strip()
+
+            if cmd == "quit":
+                self.server.quit()
+                ctypes.pointer(ctypes.c_char.from_address(5))[0]
 
     def new_submit(self, ext):
         pass
