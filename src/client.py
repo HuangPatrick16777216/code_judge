@@ -106,20 +106,20 @@ def main():
 
         elif action == "s":
             clear()
-            print("1: Python 3.8.0")
-            print("2: Python 2.7.17")
-            print("3: C++ (g++ 7.5.0)")
-            print("4: C (gcc 7.5.0)")
-            print("5: Go")
-            lang = int(input("Language: "))
-
-            clear()
             conn.send({"type": "get_problems"})
             problems = conn.recv()["problems"]
             print("ID: Name, Difficulty, Number of cases")
             for pid, name, difficult, num_cases in problems:
                 print(f"{pid}: {name}, {difficult}, {num_cases}")
             pid = int(input("Problem ID: "))
+
+            clear()
+            print("1: Python 3.8.0")
+            print("2: Python 2.7.17")
+            print("3: C++ (g++ 7.5.0)")
+            print("4: C (gcc 7.5.0)")
+            print("5: Go")
+            lang = int(input("Language: "))
 
             path = askopenfilename()
             if path and os.path.isfile(path):
