@@ -305,11 +305,10 @@ def main():
         with open("settings.json", "r") as file:
             data = json.load(file)
             ip = data["ip"]
-            password = data["password"]
     else:
         ip = input("IP: ")
-        password = getpass("Password (leave blank for none): ")
 
+    password = getpass("Password (leave blank for none): ")
     grader = Grader()
     server = Server(ip, 5555, grader, password)
     server.start()
