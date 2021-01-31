@@ -40,6 +40,9 @@ from getpass import getpass
 colorama.init()
 
 TIME_LIMIT = 2
+PARENT = os.path.realpath(os.path.dirname(__file__))
+FILE_EXTENSIONS = {1: ".py", 2: ".py", 3: ".cpp", 4: ".c", 5: ".go", 6: ".java"}
+
 CPP_COMPILE = "g++ {} -o {}"
 C_COMPILE = "gcc {} -o {}"
 PY3_CMD = "python3.8 {}"
@@ -174,15 +177,15 @@ class Client:
 
 
 class Grader:
-    parent = os.path.realpath(os.path.dirname(__file__))
     supported_langs = (1, 2, 3, 4, 5, 6)
 
     def __init__(self):
         self.queue = []
         self.pids = []
+        self.console = None
 
-        os.makedirs(os.path.join(self.parent, "grader"), exist_ok=True)
-        os.makedirs(os.path.join(self.parent, "submissions"), exist_ok=True)
+        os.makedirs(os.path.join(PARENT, "grader"), exist_ok=True)
+        os.makedirs(os.path.join(PARENT, "submissions"), exist_ok=True)
         self.load_problems()
         threading.Thread(target=self.grader).start()
 
@@ -193,18 +196,19 @@ class Grader:
 
             try:
                 client, pid, lang, code = self.queue.pop(0)
-                submit_path = os.path.join(self.parent, "grader", "submission")
-                submissions_path = os.path.join(self.parent, "submissions")
-                compiled_path = os.path.join(self.parent, "grader", "compiled")
-                in_path = os.path.join(self.parent, "grader", "in")
-                out_path = os.path.join(self.parent, "grader", "out")
-                err_path = os.path.join(self.parent, "grader", "err")
-                data_path = os.path.join(self.parent, "problems", self.pids[[x[1] for x in self.pids].index(pid)][0])
+                submit_path = os.path.join(PARENT, "grader", "submission")
+                submissions_path = os.path.join(PARENT, "submissions")
+                compiled_path = os.path.join(PARENT, "grader", "compiled")
+                in_path = os.path.join(PARENT, "grader", "in")
+                out_path = os.path.join(PARENT, "grader", "out")
+                err_path = os.path.join(PARENT, "grader", "err")
+                data_path = os.path.join(PARENT, "problems", self.pids[[x[1] for x in self.pids].index(pid)][0])
                 submit_save_path = 0
                 if len(os.listdir(submissions_path)) > 0:
                     submit_save_path = max(map(lambda x: int(x.split(".")[0]), os.listdir(submissions_path))) + 1
-                submit_save_path = os.path.join(self.parent, "submissions", str(submit_save_path)+".json")
-                submit_path += {1: ".py", 2: ".py", 3: ".cpp", 4: ".c", 5: ".go", 6: ".java"}[lang]
+                submit_save_path = os.path.join(PARENT, "submissions", str(submit_save_path)+".json")
+                submit_path += FILE_EXTENSIONS[lang]
+                self.console.new_submit(FILE_EXTENSIONS[lang][1:])
 
                 with open(data_path, "rb") as file:
                     prob_data = pickle.load(file)
@@ -277,9 +281,9 @@ class Grader:
                 print(f"Error in grading: {e}")
 
     def load_problems(self):
-        for filepath in os.listdir(os.path.join(self.parent, "problems")):
+        for filepath in os.listdir(os.path.join(PARENT, "problems")):
             try:
-                with open(os.path.join(self.parent, "problems", filepath), "rb") as file:
+                with open(os.path.join(PARENT, "problems", filepath), "rb") as file:
                     data = pickle.load(file)
                 if data["pid"] not in [x[1] for x in self.pids]:
                     self.pids.append((filepath, data["pid"]))
@@ -298,10 +302,28 @@ class Grader:
     def get_problems(self):
         problems = []
         for path, pid in self.pids:
-            with open(os.path.join(self.parent, "problems", path), "rb") as file:
+            with open(os.path.join(PARENT, "problems", path), "rb") as file:
                 data = pickle.load(file)
             problems.append((pid, data["name"], data["difficulty"], len(data["cases"])))
         return problems
+
+
+class Console:
+    stats_path = os.path.join(PARENT, "stats")
+
+    def __init__(self, server):
+        if os.path.isfile(self.stats_path):
+            with open(self.stats_path, "rb") as file:
+                self.stats = file.read()
+        else:
+            self.stats = {"submissions": {}}
+
+    def start(self):
+        while True:
+            cmd = input().strip()
+
+    def new_submit(self, ext):
+        pass
 
 
 def main():
@@ -315,7 +337,10 @@ def main():
     password = getpass("Password (leave blank for none): ")
     grader = Grader()
     server = Server(ip, 5555, grader, password)
-    server.start()
+    console = Console(server)
+    grader.console = console
+    threading.Thread(target=server.start).start()
+    console.start()
 
 
 main()
