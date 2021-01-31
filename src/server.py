@@ -190,10 +190,7 @@ class Grader:
                 if len(os.listdir(submissions_path)) > 0:
                     submit_save_path = max(map(lambda x: int(x.split(".")[0]), os.listdir(submissions_path))) + 1
                 submit_save_path = os.path.join(self.parent, "submissions", str(submit_save_path)+".json")
-                if lang == 3:
-                    submit_path += ".cpp"
-                elif lang == 4:
-                    submit_path += ".c"
+                submit_path += {1: ".py", 2: ".py", 3: ".cpp", 4: ".c", 5: ".go"}[lang]
 
                 with open(data_path, "rb") as file:
                     prob_data = pickle.load(file)
@@ -202,12 +199,17 @@ class Grader:
                 with open(submit_save_path, "w") as file:
                     json.dump({"from": client.addr, "time": str(datetime.now()), "code": code}, file, indent=4)
 
-                if lang == 3:
-                    os.system(CPP_COMPILE.format(submit_path, compiled_path))
-                elif lang == 4:
-                    os.system(C_COMPILE.format(submit_path, compiled_path))
-
                 client.send({"type": "submit", "num_cases": len(prob_data["cases"])})
+
+                status = 0
+                if lang == 3:
+                    status = os.system(CPP_COMPILE.format(submit_path, compiled_path))
+                elif lang == 4:
+                    status = os.system(C_COMPILE.format(submit_path, compiled_path))
+                if status == 0:
+                    client.send({"type": "submit", "compiled": True})
+                else:
+                    client.send({"type": "submit", "compiled": False})
 
                 for i, data in enumerate(prob_data["cases"]):
                     in_data, out_data = data

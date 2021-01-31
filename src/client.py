@@ -133,6 +133,10 @@ def main():
                     sys.stdout.write("Your submission is in the server queue and will be graded shortly.")
                     sys.stdout.flush()
                     num_cases = conn.recv()["num_cases"]
+                    compiled = conn.recv()["compiled"]
+                    if not compiled:
+                        print("Compilation error. Aborting.")
+                        continue
                     results = []
 
                     errored = False
