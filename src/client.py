@@ -136,6 +136,7 @@ def main():
                     compiled = conn.recv()["compiled"]
                     if not compiled:
                         print("Compilation error. Aborting.")
+                        input("Press enter to clear.")
                         continue
                     results = []
 
