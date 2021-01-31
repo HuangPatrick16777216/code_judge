@@ -25,6 +25,7 @@ from colorama import Fore
 from hashlib import sha256
 from tkinter import Tk
 from tkinter.filedialog import askopenfilename
+from getpass import getpass
 Tk().withdraw()
 colorama.init()
 
@@ -40,9 +41,12 @@ class Client:
         self.auth()
 
     def auth(self):
-        task = self.recv()["task"]
-        ans = sha256(task).hexdigest()
-        self.send({"type": "auth", "answer": ans})
+        task = self.recv()
+        ans = sha256(task["task"]).hexdigest()
+        password = ""
+        if task["password"]:
+            password = getpass("Password: ")
+        self.send({"type": "auth", "answer": ans, "password": password})
 
     def send(self, obj):
         data = pickle.dumps(obj)
