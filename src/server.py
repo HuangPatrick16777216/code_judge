@@ -36,6 +36,7 @@ import colorama
 from colorama import Fore
 from hashlib import sha256
 from datetime import datetime
+from getpass import getpass
 colorama.init()
 
 CPP_COMPILE = "g++ {} -o {}"
@@ -46,10 +47,11 @@ GO_CMD = "go run {}"
 
 
 class Server:
-    def __init__(self, ip, port, grader):
+    def __init__(self, ip, port, grader, password):
         self.ip = ip
         self.port = port
         self.grader = grader
+        self.password = password
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server.bind((ip, port))
 
@@ -61,7 +63,7 @@ class Server:
 
         while True:
             conn, addr = self.server.accept()
-            client = Client(conn, addr, self.grader)
+            client = Client(conn, addr, self.grader, self.password)
             self.clients.append(client)
 
 
@@ -70,27 +72,32 @@ class Client:
     padding = " " * header
     packet_size = 1024
 
-    def __init__(self, conn, addr, grader):
+    def __init__(self, conn, addr, grader, password):
         self.conn = conn
         self.addr = addr
         self.grader = grader
         self.active = True
 
         self.alert("INFO", "Connected")
-        self.auth()
+        self.auth(password)
         threading.Thread(target=self.start).start()
 
-    def auth(self):
+    def auth(self, password):
         chars = bytes(range(256))
         task = b"".join(random.choices([chars[i:i+1] for i in range(len(chars))], k=64))
         answer = sha256(task).hexdigest()
-        self.send({"type": "auth", "task": task})
-        reply = self.recv()["answer"]
-        if answer == reply:
+        self.send({"type": "auth", "task": task, "password": password != ""})
+        reply = self.recv()
+        if answer == reply["answer"]:
             self.alert("INFO", "Authenticated")
         else:
             self.alert("ERROR", "Authentication failed")
             self.conn.close()
+            return
+        if password != "" and reply["password"] != password:
+            self.alert("ERROR", "Wrong password")
+            self.conn.close()
+            return
 
     def start(self):
         while True:
@@ -293,11 +300,13 @@ def main():
         with open("settings.json", "r") as file:
             data = json.load(file)
             ip = data["ip"]
+            password = data["password"]
     else:
         ip = input("IP: ")
+        password = getpass("Password (leave blank for none): ")
 
     grader = Grader()
-    server = Server(ip, 5555, grader)
+    server = Server(ip, 5555, grader, password)
     server.start()
 
 
