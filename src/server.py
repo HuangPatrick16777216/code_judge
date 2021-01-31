@@ -39,6 +39,7 @@ from datetime import datetime
 from getpass import getpass
 colorama.init()
 
+TIME_LIMIT = 2
 CPP_COMPILE = "g++ {} -o {}"
 C_COMPILE = "gcc {} -o {}"
 PY3_CMD = "python3.8 {}"
@@ -251,7 +252,7 @@ class Grader:
                         p = subprocess.Popen(commands, stdin=in_file, stdout=out_file, stderr=err_file)
                         timeout = False
                         while p.poll() is None:
-                            if time.time() - time_start > 3:
+                            if time.time() - time_start > TIME_LIMIT:
                                 p.kill()
                                 timeout = True
                                 break
