@@ -16,7 +16,7 @@ The first line contains the size, `N`, of `S`
 The next line contains `N` integers, each an element of `S`
 
 ## Output Format
-A single integer specifying the remaining value from the operations described above.
+A single integer specifying the remaining value from the operations described above.<br>
 Please print the output without the decimal point. The grader will mark it wrong otherwise.
 
 ## Constraints
