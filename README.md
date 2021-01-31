@@ -1,5 +1,5 @@
 # Code Judge
-Command line code judge
+Command line code grading system
 
 <br>
 
