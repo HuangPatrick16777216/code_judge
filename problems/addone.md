@@ -2,6 +2,7 @@
 * Test cases: 10
 * Author: Patrick Huang
 * License: GPL
+* Difficulty: 1
 
 ## Description
 Add one to an integer, `N`.
