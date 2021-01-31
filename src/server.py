@@ -44,6 +44,7 @@ C_COMPILE = "gcc {} -o {}"
 PY3_CMD = "python3.8 {}"
 PY2_CMD = "python2 {}"
 GO_CMD = "go run {}"
+JAVA_CMD = "java {}"
 
 
 class Server:
@@ -173,7 +174,7 @@ class Client:
 
 class Grader:
     parent = os.path.realpath(os.path.dirname(__file__))
-    supported_langs = (1, 2, 3, 4, 5)
+    supported_langs = (1, 2, 3, 4, 5, 6)
 
     def __init__(self):
         self.queue = []
@@ -244,6 +245,8 @@ class Grader:
                             commands = [compiled_path]
                         elif lang == 5:
                             commands = GO_CMD.format(submit_path).split()
+                        elif lang == 6:
+                            commands = JAVA_CMD.format(submit_path).split()
 
                         p = subprocess.Popen(commands, stdin=in_file, stdout=out_file, stderr=err_file)
                         timeout = False

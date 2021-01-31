@@ -172,6 +172,7 @@ def main():
             print("3: C++ (g++ 7.5.0)")
             print("4: C (gcc 7.5.0)")
             print("5: Go")
+            print("6: Java 11")
             lang = int(input("Language: "))
 
             path = askopenfilename()
