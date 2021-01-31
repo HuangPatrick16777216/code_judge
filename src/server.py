@@ -203,7 +203,7 @@ class Grader:
                 if len(os.listdir(submissions_path)) > 0:
                     submit_save_path = max(map(lambda x: int(x.split(".")[0]), os.listdir(submissions_path))) + 1
                 submit_save_path = os.path.join(self.parent, "submissions", str(submit_save_path)+".json")
-                submit_path += {1: ".py", 2: ".py", 3: ".cpp", 4: ".c", 5: ".go"}[lang]
+                submit_path += {1: ".py", 2: ".py", 3: ".cpp", 4: ".c", 5: ".go", 6: ".java"}[lang]
 
                 with open(data_path, "rb") as file:
                     prob_data = pickle.load(file)
