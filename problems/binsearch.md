@@ -1,5 +1,5 @@
 # Max Num
-* Test cases: 10
+* Test cases: 20
 * Author: Patrick Huang
 * License: GPL
 * Difficulty: 3
@@ -18,9 +18,10 @@ The last line contains `Q` space separated integers, which are the queries.
 Output `Q` lines, each with the position of a query.
 
 ## Constraints
-`10 <= L < 1,000,000`
-`1 <= Q < 1,000,000`
-`1 <= Si <= 1,000,000,000`
+`10 <= L < 1,000,000`<br>
+`1 <= Q < 1,000,000`<br>
+`1 <= Si <= 1,000,000,000`<br>
+Problem may not be completely solvable for slower languages like Python.
 
 ## Sample Input
 ```
