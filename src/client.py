@@ -211,6 +211,7 @@ def main():
                             print(curr_result["error"])
                             input("Press enter to clear.")
                             errored = True
+                            break
 
                     if not errored:
                         clear()
