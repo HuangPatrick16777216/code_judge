@@ -19,7 +19,7 @@ Output `Q` lines, each with the position of a query.
 
 ## Constraints
 `10 <= L < 1,000,000`
-`1 <= Q < 100,000`
+`1 <= Q < 1,000,000`
 `1 <= Si <= 1,000,000,000`
 
 ## Sample Input
