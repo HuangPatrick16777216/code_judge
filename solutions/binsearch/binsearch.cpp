@@ -29,6 +29,6 @@ int main() {
     }
 
     for (auto q: queries) {
-        std::cout << search(nums, q, 0, len)+1 << std::endl;
+        std::cout << search(nums, q, 0, len) << std::endl;
     }
 }

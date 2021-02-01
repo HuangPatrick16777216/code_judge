@@ -15,7 +15,7 @@ The next line contains `L` space separated integers, which are elements in `S`.<
 The last line contains `Q` space separated integers, which are the queries.
 
 ## Output Format
-Output `Q` lines, each with the position of a query.
+Output `Q` lines, each with the position of a query, with the first element as index 0.
 
 ## Constraints
 `10 <= L < 1,000,000`<br>
@@ -32,7 +32,7 @@ Problem may not be completely solvable for slower languages like Python.
 
 ## Sample Output
 ```
-4
-8
-1
+3
+7
+0
 ```
