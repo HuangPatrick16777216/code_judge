@@ -233,8 +233,10 @@ class Manager:
     """Manages and displays everything."""
 
     supported_langs = ("Python 3.8.0", "Python 2.7.17", "C++ (g++ 7.5.0)", "C (gcc 7.5.0)", "Go", "Java 11")
-    pid_text = Text(FONT_LARGE.render("Choose a Problem", 1, BLACK))
-    lang_text = Text(FONT_LARGE.render("Choose a Language", 1, BLACK))
+    text_pid = Text(FONT_LARGE.render("Choose a Problem", 1, BLACK))
+    text_lang = Text(FONT_LARGE.render("Choose a Language", 1, BLACK))
+    text_file = Text(FONT_LARGE.render("Choose a File", 1, BLACK))
+    button_back = Button(FONT_MED.render("Back", 1, BLACK))
 
     def __init__(self, conn):
         self.conn = conn
@@ -253,18 +255,27 @@ class Manager:
 
     def draw(self, window, events):
         if self.status == "PID":
-            self.pid_text.draw(window, (WIDTH//2, 50))
+            self.text_pid.draw(window, (WIDTH//2, 50))
             clicked = [button.draw(window, events, (WIDTH//2, 150+50*i), (WIDTH-200, 35)) for i, button in enumerate(self.pid_buttons)]
             if True in clicked:
                 self.curr_info["pid"] = self.problems[clicked.index(True)][0]
                 self.status = "LANG"
 
         elif self.status == "LANG":
-            self.lang_text.draw(window, (WIDTH//2, 50))
+            self.text_lang.draw(window, (WIDTH//2, 50))
             clicked = [button.draw(window, events, (WIDTH//2, 150+50*i), (WIDTH-200, 35)) for i, button in enumerate(self.lang_buttons)]
             if True in clicked:
                 self.curr_info["lang"] = clicked.index(True) + 1
                 self.status = "FILE"
+
+        elif self.status == "FILE":
+            pass
+
+        if self.status != "SUBMITTING" and self.button_back.draw(window, events, (50, 15), (70, 35)):
+            if self.status == "FILE":
+                self.status = "LANG"
+            elif self.status == "LANG":
+                self.status = "PID"
 
 
 def main():
