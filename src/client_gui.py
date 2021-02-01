@@ -22,8 +22,9 @@ import json
 import pygame
 from getpass import getpass
 from hashlib import sha256
+pygame.init()
 
-WIDTH, HEIGHT = 1600, 900
+WIDTH, HEIGHT = 1280, 720
 FPS = 60
 
 BLACK = (0, 0, 0)
@@ -31,6 +32,10 @@ GRAY_DARK = (64, 64, 64)
 GRAY = (128, 128, 128)
 GRAY_LIGHT = (192, 192, 192)
 WHITE = (255, 255, 255)
+
+FONT_SMALL = pygame.font.SysFont("ubuntu", 14)
+FONT_MED = pygame.font.SysFont("ubuntu", 20)
+FONT_LARGE = pygame.font.SysFont("ubuntu", 36)
 
 
 class Text:
@@ -224,6 +229,44 @@ class Client:
         return pickle.loads(data)
 
 
+class Manager:
+    """Manages and displays everything."""
+
+    supported_langs = ("Python 3.8.0", "Python 2.7.17", "C++ (g++ 7.5.0)", "C (gcc 7.5.0)", "Go", "Java 11")
+    pid_text = Text(FONT_LARGE.render("Choose a Problem", 1, BLACK))
+    lang_text = Text(FONT_LARGE.render("Choose a Language", 1, BLACK))
+
+    def __init__(self, conn):
+        self.conn = conn
+        self.status = "PID"
+        self.init()
+
+    def init(self):
+        self.curr_info = {}
+
+        self.conn.send({"type": "get_problems"})
+        self.problems = self.conn.recv()["problems"]
+        self.pid_buttons = [Button(FONT_MED.render(f"{pid}: {name}, Difficulty={difficult}, Number of cases={num_cases}", 1, BLACK))
+            for pid, name, difficult, num_cases in self.problems]
+
+        self.lang_buttons = [Button(FONT_MED.render(lang, 1, BLACK)) for lang in self.supported_langs]
+
+    def draw(self, window, events):
+        if self.status == "PID":
+            self.pid_text.draw(window, (WIDTH//2, 50))
+            clicked = [button.draw(window, events, (WIDTH//2, 150+50*i), (WIDTH-200, 35)) for i, button in enumerate(self.pid_buttons)]
+            if True in clicked:
+                self.curr_info["pid"] = self.problems[clicked.index(True)][0]
+                self.status = "LANG"
+
+        elif self.status == "LANG":
+            self.lang_text.draw(window, (WIDTH//2, 50))
+            clicked = [button.draw(window, events, (WIDTH//2, 150+50*i), (WIDTH-200, 35)) for i, button in enumerate(self.lang_buttons)]
+            if True in clicked:
+                self.curr_info["lang"] = clicked.index(True) + 1
+                self.status = "FILE"
+
+
 def main():
     if os.path.isfile("settings.json"):
         with open("settings.json", "r") as file:
@@ -233,6 +276,7 @@ def main():
         ip = input("IP: ")
 
     conn = Client(ip, 5555)
+    manager = Manager(conn)
 
     pygame.display.set_caption("Code Judge")
     window = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -248,7 +292,8 @@ def main():
                 pygame.quit()
                 return
 
-        window.fill(BLACK)
+        window.fill(WHITE)
+        manager.draw(window, events)
 
 
 main()
