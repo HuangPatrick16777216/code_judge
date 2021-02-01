@@ -20,6 +20,7 @@ import socket
 import pickle
 import json
 import pygame
+from copy import deepcopy
 from getpass import getpass
 from hashlib import sha256
 from tkinter import Tk
@@ -239,6 +240,7 @@ class Manager:
     text_pid = Text(FONT_LARGE.render("Choose a Problem", 1, BLACK))
     text_lang = Text(FONT_LARGE.render("Choose a Language", 1, BLACK))
     text_file = Text(FONT_LARGE.render("Choose a File", 1, BLACK))
+    text_submitting = Text(FONT_LARGE.render("Server is grading...", 1, BLACK))
 
     button_back = Button(FONT_MED.render("Back", 1, BLACK))
     button_select_file = Button(FONT_MED.render("Select File", 1, BLACK))
@@ -280,6 +282,11 @@ class Manager:
             if self.button_select_file.draw(window, events, (490, 670), (150, 35)):
                 self.sel_path = askopenfilename()
             if self.button_submit.draw(window, events, (790, 670), (150, 35)) and self.sel_path is not None:
+                send_data = deepcopy(self.curr_info)
+                send_data["type"] = "submit"
+                with open(self.sel_path, "r") as file:
+                    send_data["code"] = file.read()
+                self.conn.send(send_data)
                 self.status = "SUBMITTING"
 
             if self.sel_path is None:
@@ -287,6 +294,9 @@ class Manager:
             else:
                 text_path = Text(FONT_MED.render(f"Selected file: {self.sel_path}", 1, BLACK))
             text_path.draw(window, (640, 300))
+
+        elif self.status == "SUBMITTING":
+            self.text_submitting.draw(window, (WIDTH//2, 50))
 
         if self.status != "SUBMITTING" and self.button_back.draw(window, events, (50, 15), (70, 35)):
             if self.status == "FILE":
