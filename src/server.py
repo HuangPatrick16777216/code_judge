@@ -248,7 +248,6 @@ class Grader:
                             continue
 
                         commands = None
-                        time_start = time.time()
                         if lang == 1:
                             commands = PY3_CMD.format(submit_path).split()
                         elif lang == 2:
@@ -260,6 +259,7 @@ class Grader:
                         elif lang == 6:
                             commands = JAVA_CMD.format(submit_path).split()
 
+                        time_start = time.time()
                         p = subprocess.Popen(commands, stdin=in_file, stdout=out_file, stderr=err_file)
                         timeout = False
                         while p.poll() is None:

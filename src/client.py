@@ -117,7 +117,7 @@ def print_results(results):
         sys.stdout.write("\n|")
         for result in row:
             if result["result"] == "*":
-                time = str(int(result["elapse"])*1000) + " ms"
+                time = str(int(result["elapse"]*1000)) + " ms"
                 offset = int((9-len(time))/2)
                 msg = " "*offset + time
                 msg += " " * (9-len(msg))
