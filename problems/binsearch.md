@@ -5,13 +5,13 @@
 * Difficulty: 3
 
 ## Description
-You are given a sorted list, `S`, with `L` elements, of integers.<br>
-You are also given `Q` not necessarily distinct queries.<br>
-For each `N` in `Q`, output the position of `N` in `S`. It is guarenteed that `N` is in `S`.
+You are given a sorted list, `S`, with `L` elements, of integers.</br>
+You are also given `Q` not necessarily distinct queries.</br>
+For each `N` in `Q`, output the position of `N` in `S`. It is guaranteed that `N` is in `S`.
 
 ## Input Format
-The first line contains `L` and `Q`, space separated.<br>
-The next line contains `L` space separated integers, which are elements in `S`.<br>
+The first line contains `L` and `Q`, space separated.</br>
+The next line contains `L` space separated integers, which are elements in `S`.</br>
 The last line contains `Q` space separated integers, which are the queries.
 
 ## Output Format
