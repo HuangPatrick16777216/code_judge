@@ -122,6 +122,8 @@ def print_results(results):
                 msg = " "*offset + time
                 msg += " " * (9-len(msg))
                 sys.stdout.write(msg + "|")
+            else:
+                sys.stdout.write("         |")
 
         sys.stdout.write("\n+")
         for j in range(len(row)):
