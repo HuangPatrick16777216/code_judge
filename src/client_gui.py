@@ -15,7 +15,10 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+#! INCOMPLETE
+
 import os
+import threading
 import socket
 import pickle
 import json
@@ -241,6 +244,7 @@ class Manager:
     text_lang = Text(FONT_LARGE.render("Choose a Language", 1, BLACK))
     text_file = Text(FONT_LARGE.render("Choose a File", 1, BLACK))
     text_submitting = Text(FONT_LARGE.render("Server is grading...", 1, BLACK))
+    text_queued = Text(FONT_LARGE.render("Your submission is queued.", 1, BLACK))
 
     button_back = Button(FONT_MED.render("Back", 1, BLACK))
     button_select_file = Button(FONT_MED.render("Select File", 1, BLACK))
@@ -254,6 +258,7 @@ class Manager:
     def init(self):
         self.curr_info = {}
         self.sel_path = None
+        self.grading = False
 
         self.conn.send({"type": "get_problems"})
         self.problems = self.conn.recv()["problems"]
@@ -261,6 +266,12 @@ class Manager:
             for pid, name, difficult, num_cases in self.problems]
 
         self.lang_buttons = [Button(FONT_MED.render(lang, 1, BLACK)) for lang in self.supported_langs]
+
+    def disp_results(self, window, num_cases):
+        self.conn.recv()
+        results = []
+        while len(results) < num_cases:
+            result = self.conn.recv()
 
     def draw(self, window, events):
         if self.status == "PID":
@@ -287,7 +298,10 @@ class Manager:
                 with open(self.sel_path, "r") as file:
                     send_data["code"] = file.read()
                 self.conn.send(send_data)
+
                 self.status = "SUBMITTING"
+                num_cases = self.problems[[x[0] for x in self.problems].index(self.curr_info["pid"])][3]
+                threading.Thread(target=self.disp_results, args=(window, num_cases)).start()
 
             if self.sel_path is None:
                 text_path = Text(FONT_MED.render("Selected file: <No file selected>", 1, BLACK))
@@ -296,13 +310,19 @@ class Manager:
             text_path.draw(window, (640, 300))
 
         elif self.status == "SUBMITTING":
-            self.text_submitting.draw(window, (WIDTH//2, 50))
+            if self.grading:
+                self.text_submitting.draw(window, (WIDTH//2, 50))
+            else:
+                self.text_queued.draw(window, (WIDTH//2, 50))
 
         if self.status != "SUBMITTING" and self.button_back.draw(window, events, (50, 15), (70, 35)):
             if self.status == "FILE":
                 self.status = "LANG"
             elif self.status == "LANG":
                 self.status = "PID"
+            elif self.status == "SUBMITTED":
+                self.status = "PID"
+                self.init()
 
 
 def main():
