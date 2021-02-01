@@ -8,7 +8,7 @@
 Find the maximum of a sequence, `S`, of integers
 
 ## Input Format
-The first line contains the size, `N`, of `S`.<br>
+The first line contains the size, `N`, of `S`.</br>
 The next line contains `N` integers, each an element of `S`
 
 ## Output Format
