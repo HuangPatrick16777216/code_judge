@@ -18,8 +18,8 @@ The last line contains `Q` space separated integers, which are the queries.
 Output `Q` lines, each with the position of a query, with the first element as index 0.
 
 ## Constraints
-`10 <= L < 1,000,000`<br>
-`1 <= Q < 1,000,000`<br>
+`10 <= L < 500,000`<br>
+`1 <= Q < 100,000`<br>
 `1 <= Si <= 1,000,000,000`<br>
 Problem may not be completely solvable for slower languages like Python.
 
