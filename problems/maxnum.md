@@ -15,7 +15,7 @@ The next line contains `N` integers, each an element of `S`
 A single integer specifying the largest element in `S`
 
 ## Constraints
-`0 <= N <= 100,000`
+`0 <= N <= 100,000`<br>
 `0 <= Si < 100,000`
 
 ## Sample Input

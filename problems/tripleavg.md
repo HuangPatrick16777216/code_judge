@@ -20,10 +20,10 @@ A single integer specifying the remaining value from the operations described ab
 Please print the output without the decimal point. The grader will mark it wrong otherwise.
 
 ## Constraints
-`0 <= N <= 5` for cases 1-10
-`0 <= N <= 999` for cases 11-20
-`0 <= Si < 1000` for cases 1-10
-`0 <= Si < 100000` for cases 11-20
+`0 <= N <= 5` for cases 1-10<br>
+`0 <= N <= 999` for cases 11-20<br>
+`0 <= Si < 1000` for cases 1-10<br>
+`0 <= Si < 100000` for cases 11-20<br>
 
 ## Sample Input
 ```
