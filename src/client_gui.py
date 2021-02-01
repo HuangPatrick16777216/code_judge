@@ -22,7 +22,10 @@ import json
 import pygame
 from getpass import getpass
 from hashlib import sha256
+from tkinter import Tk
+from tkinter.filedialog import askopenfilename
 pygame.init()
+Tk().withdraw()
 
 WIDTH, HEIGHT = 1280, 720
 FPS = 60
@@ -236,7 +239,10 @@ class Manager:
     text_pid = Text(FONT_LARGE.render("Choose a Problem", 1, BLACK))
     text_lang = Text(FONT_LARGE.render("Choose a Language", 1, BLACK))
     text_file = Text(FONT_LARGE.render("Choose a File", 1, BLACK))
+
     button_back = Button(FONT_MED.render("Back", 1, BLACK))
+    button_select_file = Button(FONT_MED.render("Select File", 1, BLACK))
+    button_submit = Button(FONT_MED.render("Submit", 1, BLACK))
 
     def __init__(self, conn):
         self.conn = conn
@@ -245,6 +251,7 @@ class Manager:
 
     def init(self):
         self.curr_info = {}
+        self.sel_path = None
 
         self.conn.send({"type": "get_problems"})
         self.problems = self.conn.recv()["problems"]
@@ -269,7 +276,17 @@ class Manager:
                 self.status = "FILE"
 
         elif self.status == "FILE":
-            pass
+            self.text_file.draw(window, (WIDTH//2, 50))
+            if self.button_select_file.draw(window, events, (490, 670), (150, 35)):
+                self.sel_path = askopenfilename()
+            if self.button_submit.draw(window, events, (790, 670), (150, 35)) and self.sel_path is not None:
+                self.status = "SUBMITTING"
+
+            if self.sel_path is None:
+                text_path = Text(FONT_MED.render("Selected file: <No file selected>", 1, BLACK))
+            else:
+                text_path = Text(FONT_MED.render(f"Selected file: {self.sel_path}", 1, BLACK))
+            text_path.draw(window, (640, 300))
 
         if self.status != "SUBMITTING" and self.button_back.draw(window, events, (50, 15), (70, 35)):
             if self.status == "FILE":
