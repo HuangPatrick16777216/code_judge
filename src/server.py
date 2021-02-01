@@ -91,8 +91,7 @@ class Client:
 
     def init(self, password):
         self.alert("INFO", "Connected")
-        if self.auth(password):
-            threading.Thread(target=self.start).start()
+        self.auth(password)
 
     def auth(self, password):
         chars = bytes(range(256))
@@ -106,13 +105,13 @@ class Client:
         else:
             self.alert("ERROR", "Authentication failed")
             self.conn.close()
-            return False
+            return
         if password != "" and reply["password"] != password:
             self.alert("ERROR", "Wrong password")
             self.conn.close()
-            return False
+            return
 
-        return True
+        threading.Thread(target=self.start).start()
 
     def start(self):
         while True:
